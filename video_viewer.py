@@ -92,9 +92,12 @@ class YouTube_Viewer():
         print('Video stopped')
         time.sleep(1)
         print('Done!')
+    
+    def stop_session(self):
+        self.scraper.close()
 
         
-def get_video_time(driver):
+""" def get_video_time(driver):
     # Obtain the length of the youtube video
     duration = driver.find_elements_by_xpath("//span[@class='ytp-time-duration']")[0].text
 
@@ -135,11 +138,12 @@ def watch_video(chromeDriverPath:str, url:str, loadWaitTime:int):
     total_runtime = get_video_time(driver)
     start_video(driver, total_runtime)
 
-#watch_video('./chromedriver', 'https://www.youtube.com/watch?v=w6YeJOYOOds', 2)
-youtube_video = YouTube_Viewer('https://www.youtube.com/watch?v=w6YeJOYOOds')
-youtube_video.start_video()
 
-""" service = Service('./chromedriver')
+# watch_video('./chromedriver', 'https://www.youtube.com/watch?v=w6YeJOYOOds', 2)
+# youtube_video = YouTube_Viewer('https://www.youtube.com/watch?v=w6YeJOYOOds')
+# youtube_video.start_video()
+
+service = Service('./chromedriver')
 driver = webdriver.Chrome(service=service)
 driver.get('https://www.youtube.com/watch?v=DXUAyRRkI6k')
 # wait for the page to load everything (works without it)
