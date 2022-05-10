@@ -1,1 +1,5 @@
 ./chromedriver
+__pycache__/loadVideoList.cpython-38.pyc
+__pycache__/video_viewer.cpython-38.pyc
+tester.py
+test_selenium.py

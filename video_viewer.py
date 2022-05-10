@@ -2,32 +2,45 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 import time, datetime
+import subprocess, shlex
 
 
 
 
 class YouTube_Viewer():
-    def __init__(self, video_url, resolution='480p', browserDriverPath='./chromedriver', loadWaitTime=2) -> None:
+    def __init__(self, video_url, resolution='480p', browserDriverPath='./chromedriver', loadWaitTime=2, headless=True) -> None:
         self.video_url = video_url
         self.resolution = resolution
         self.browserDriverPath = browserDriverPath
         self.loadWaitTime = loadWaitTime
-        self.scraper = self.__setup_youtube_scraper()
+        self.scraper = self.__setup_youtube_scraper(headless=headless)
         self.videoLength = self.__get_video_length()
+        self.video_title = self.__get_video_title()
     
-    def __setup_youtube_scraper(self):
+    def __setup_youtube_scraper(self, headless=True):
+        options = Options()
+        if headless:
+            options.add_argument('--headless')
+            
         #Load Chrome and get URL
         service = Service(self.browserDriverPath)
-        driver = webdriver.Chrome(service=service)
+        driver = webdriver.Chrome(service=service, options=options)
         driver.get(self.video_url)
         #Wait for page to load
         print('Waiting %d sec(s) to load' %self.loadWaitTime)
         for i in range(self.loadWaitTime):
             print(i)
             time.sleep(1)
+
+        title = driver.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
+        print(title)
         return driver
+    
+    def __get_video_title(self):
+        return self.scraper.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
     
     def __get_video_length(self):
         # Obtain the length of the youtube video
@@ -72,14 +85,30 @@ class YouTube_Viewer():
                 return True
         return False """
     
+    def __start_tcpdump(self,password:str)->subprocess.Popen:
+        proc = subprocess.Popen(['sudo', '-S','tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
+        proc.stdin.write((password + '\n'))
+        proc.stdin.flush()
+        return proc
+    
+    def __end_tcpdump(self, tcpdump:subprocess.Popen, password:str):
+        # print(tcpdump.stdout.read())
+        kill = subprocess.Popen(shlex.split('kill '+str(tcpdump.pid)), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        kill.stdin.write((password + '\n').encode())
+        kill.stdin.flush()
 
-    def start_video(self):
+    def start_video(self, password:str):
+        password = password.strip()
         try:
             self.__set_resolution()
         except:
             pass
-        #Get the movie player
+        # Get the movie player
         video = self.scraper.find_element_by_id('movie_player')
+        
+        # Start tcpdump
+        tcpdump =self.__start_tcpdump(password)
+        #print(tcpdump.stdout.read())
         print('Play!')
         time.sleep(2)
         
@@ -90,7 +119,11 @@ class YouTube_Viewer():
         #Stop video
         video.click()
         print('Video stopped')
-        time.sleep(1)
+        
+        # End tcpdump
+        self.__end_tcpdump(tcpdump, password)
+        
+        time.sleep(5)
         print('Done!')
     
     def stop_session(self):
