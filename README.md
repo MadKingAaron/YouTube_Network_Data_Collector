@@ -1,1 +1,8 @@
-# YouTube_Network_Data_Collector
+# YouTube Network Data Collector
+
+    python3 runner.py <password>
+## Required Packages
+
+ - Selenium
+
+ 
