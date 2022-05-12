@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
+#from webdriver_manager.chrome import ChromeDriverManager
 import time, datetime
 import subprocess, shlex
 
@@ -24,7 +24,7 @@ class YouTube_Viewer():
         options = Options()
         if headless:
             options.add_argument('--headless')
-            
+        options.add_argument("--mute-audio")  
         #Load Chrome and get URL
         service = Service(self.browserDriverPath)
         driver = webdriver.Chrome(service=service, options=options)
