@@ -87,14 +87,21 @@ class YouTube_Viewer():
     
     def __start_tcpdump(self,password:str)->subprocess.Popen:
         proc = subprocess.Popen(['sudo', '-S','tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
-        proc.stdin.write((password + '\n'))
+        
+        try:
+            proc.stdin.write((password + '\n'))
+        except:
+            proc.stdin.write((password + '\n').encode())
         proc.stdin.flush()
         return proc
     
     def __end_tcpdump(self, tcpdump:subprocess.Popen, password:str):
         # print(tcpdump.stdout.read())
         kill = subprocess.Popen(shlex.split('kill '+str(tcpdump.pid)), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-        kill.stdin.write((password + '\n').encode())
+        try:
+            kill.stdin.write((password + '\n').encode())
+        except:
+            kill.stdin.write((password + '\n'))
         kill.stdin.flush()
 
     def start_video(self, password:str):
