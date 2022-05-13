@@ -1,8 +1,12 @@
 # YouTube Network Data Collector
 
     python3 runner.py <password>
-## Required Packages
+## Dependencies
 
  - Selenium
+ - Chrome Web Driver (in root of project folder)
+ - Google Chrome installation
+
+ 
 
  
