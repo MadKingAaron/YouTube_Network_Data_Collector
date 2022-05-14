@@ -3,12 +3,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-#from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager
 import time, datetime
 import subprocess, shlex
+import re
 
 
+def check_if_has_hours(time):
+    pattern = re.compile(r"[0-9]+:[0-9]+:[0-9]+", re.IGNORECASE)
+    return pattern.match(time)
 
+def check_if_no_hours(time):
+    pattern = re.compile(r"[0-9]+:[0-9]+", re.IGNORECASE)
+    return pattern.match(time)
 
 class YouTube_Viewer():
     def __init__(self, video_url, resolution='480p', browserDriverPath='./chromedriver', loadWaitTime=2, headless=True) -> None:
@@ -45,10 +52,19 @@ class YouTube_Viewer():
     def __get_video_length(self):
         # Obtain the length of the youtube video
         duration = self.scraper.find_elements_by_xpath("//span[@class='ytp-time-duration']")[0].text
+        print(duration)
 
+        
         # Obtain the length of the video in seconds
-        x = time.strptime(duration, '%M:%S')
-        x1 = datetime.timedelta(minutes=x.tm_min, seconds=x.tm_sec).total_seconds()
+        if (check_if_has_hours(duration))
+            x = time.strptime(duration, '%H:%M:%S')
+            x1 = datetime.timedelta(hours=x.tm_hour, minutes=x.tm_min, seconds=x.tm_sec).total_seconds()
+        elif (check_if_no_hours(duration)):
+            x = time.strptime(duration, '%M:%S')
+            x1 = datetime.timedelta(minutes=x.tm_min, seconds=x.tm_sec).total_seconds()
+        else:
+            return
+
         return x1 #+ 1 #Add 1 second to prevent stopping early
 
     def __set_resolution(self):
