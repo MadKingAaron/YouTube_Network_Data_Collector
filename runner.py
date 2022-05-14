@@ -7,9 +7,12 @@ def main():
     else:
         video_list = loadVideoList.loadVideoList('youtubeVideoList.txt')
         for video in video_list:
-            viewer = video_viewer.YouTube_Viewer(video_url=video, headless=True)
-            viewer.start_video(password=sys.argv[1])
-            viewer.stop_session()
+            try:
+                viewer = video_viewer.YouTube_Viewer(video_url=video, headless=True)
+                viewer.start_video(password=sys.argv[1])
+                viewer.stop_session()
+            except:
+                pass
 
 if __name__ == '__main__':
     main()
