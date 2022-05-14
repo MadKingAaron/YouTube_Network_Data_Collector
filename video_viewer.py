@@ -56,7 +56,7 @@ class YouTube_Viewer():
 
         
         # Obtain the length of the video in seconds
-        if (check_if_has_hours(duration))
+        if (check_if_has_hours(duration)):
             x = time.strptime(duration, '%H:%M:%S')
             x1 = datetime.timedelta(hours=x.tm_hour, minutes=x.tm_min, seconds=x.tm_sec).total_seconds()
         elif (check_if_no_hours(duration)):
