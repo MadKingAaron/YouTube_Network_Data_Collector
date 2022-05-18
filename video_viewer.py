@@ -101,27 +101,15 @@ class YouTube_Viewer():
                 return True
         return False """
     
-    def __start_tcpdump(self,password:str)->subprocess.Popen:
-        proc = subprocess.Popen(['sudo', '-S','tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
-        
-        try:
-            proc.stdin.write((password + '\n'))
-        except:
-            proc.stdin.write((password + '\n').encode())
-        proc.stdin.flush()
+    def __start_tcpdump(self)->subprocess.Popen:
+        proc = subprocess.Popen(['tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)  
         return proc
     
-    def __end_tcpdump(self, tcpdump:subprocess.Popen, password:str):
+    def __end_tcpdump(self, tcpdump:subprocess.Popen):
         # print(tcpdump.stdout.read())
         kill = subprocess.Popen(shlex.split('kill '+str(tcpdump.pid)), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-        try:
-            kill.stdin.write((password + '\n').encode())
-        except:
-            kill.stdin.write((password + '\n'))
-        kill.stdin.flush()
 
-    def start_video(self, password:str):
-        password = password.strip()
+    def start_video(self):
         try:
             self.__set_resolution()
         except:
@@ -130,7 +118,7 @@ class YouTube_Viewer():
         video = self.scraper.find_element_by_id('movie_player')
         
         # Start tcpdump
-        tcpdump =self.__start_tcpdump(password)
+        tcpdump =self.__start_tcpdump()
         #print(tcpdump.stdout.read())
         print('Play!')
         time.sleep(2)
