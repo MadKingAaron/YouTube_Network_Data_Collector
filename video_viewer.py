@@ -31,7 +31,10 @@ class YouTube_Viewer():
         options = Options()
         if headless:
             options.add_argument('--headless')
-        options.add_argument("--mute-audio")  
+            options.add_argument("--disable-extensions")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--mute-audio")
         #Load Chrome and get URL
         service = Service(self.browserDriverPath)
         driver = webdriver.Chrome(service=service, options=options)
@@ -102,7 +105,7 @@ class YouTube_Viewer():
         return False """
     
     def __start_tcpdump(self,password:str)->subprocess.Popen:
-        proc = subprocess.Popen(['sudo', '-S','tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
+        proc = subprocess.Popen(['sudo', '-S','tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True, shell=True)
         
         try:
             proc.stdin.write((password + '\n'))
@@ -113,7 +116,7 @@ class YouTube_Viewer():
     
     def __end_tcpdump(self, tcpdump:subprocess.Popen, password:str):
         # print(tcpdump.stdout.read())
-        kill = subprocess.Popen(shlex.split('kill '+str(tcpdump.pid)), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        kill = subprocess.Popen(shlex.split('kill '+str(tcpdump.pid)), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         try:
             kill.stdin.write((password + '\n').encode())
         except:
