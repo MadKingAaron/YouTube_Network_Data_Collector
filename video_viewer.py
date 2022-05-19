@@ -104,27 +104,15 @@ class YouTube_Viewer():
                 return True
         return False """
     
-    def __start_tcpdump(self,password:str)->subprocess.Popen:
-        proc = subprocess.Popen(['sudo', '-S','tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True, shell=True)
-        
-        try:
-            proc.stdin.write((password + '\n'))
-        except:
-            proc.stdin.write((password + '\n').encode())
+    def __start_tcpdump(self)->subprocess.Popen:
+        proc = subprocess.Popen(['tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True, shell=False)
         proc.stdin.flush()
         return proc
     
-    def __end_tcpdump(self, tcpdump:subprocess.Popen, password:str):
-        # print(tcpdump.stdout.read())
-        kill = subprocess.Popen(shlex.split('kill '+str(tcpdump.pid)), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        try:
-            kill.stdin.write((password + '\n').encode())
-        except:
-            kill.stdin.write((password + '\n'))
-        kill.stdin.flush()
+    def __end_tcpdump(self, tcpdump:subprocess.Popen):
+        kill = subprocess.Popen(shlex.split('kill '+str(tcpdump.pid)), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
 
-    def start_video(self, password:str):
-        password = password.strip()
+    def start_video(self):
         try:
             self.__set_resolution()
         except:
@@ -133,7 +121,7 @@ class YouTube_Viewer():
         video = self.scraper.find_element_by_id('movie_player')
         
         # Start tcpdump
-        tcpdump =self.__start_tcpdump(password)
+        tcpdump =self.__start_tcpdump()
         #print(tcpdump.stdout.read())
         print('Play!')
         time.sleep(2)
@@ -147,7 +135,7 @@ class YouTube_Viewer():
         print('Video stopped')
         
         # End tcpdump
-        self.__end_tcpdump(tcpdump, password)
+        self.__end_tcpdump(tcpdump)
         
         time.sleep(5)
         print('Done!')
