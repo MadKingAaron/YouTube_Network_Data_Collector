@@ -1,5 +1,7 @@
-
+import random
 
 def loadVideoList(videoListDoc:str)->tuple:
     list_file = open(videoListDoc, 'r')
-    return tuple(list_file.readlines())
+    links = list_file.readlines()
+    random.shuffle(links)
+    return tuple(links)
