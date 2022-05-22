@@ -102,7 +102,7 @@ class YouTube_Viewer():
         return False """
     
     def __start_tcpdump(self)->subprocess.Popen:
-        proc = subprocess.Popen(['tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)  
+        proc = subprocess.Popen(['tshark','-w', self.video_title+'.pcap'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
         return proc
     
     def __end_tcpdump(self, tcpdump:subprocess.Popen):
