@@ -102,7 +102,7 @@ class YouTube_Viewer():
         return False """
     
     def __start_tcpdump(self,password:str)->subprocess.Popen:
-        proc = subprocess.Popen(['sudo', '-S','tcpdump', '-n','-s', '0','-w', self.video_title+'.pcap', '-p'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
+        proc = subprocess.Popen(['sudo', '-S','tshark','-w', self.video_title+'.pcap'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
         
         try:
             proc.stdin.write((password + '\n'))
