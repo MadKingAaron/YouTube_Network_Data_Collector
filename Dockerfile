@@ -4,7 +4,11 @@ COPY . /app
 WORKDIR /app
 
 ### Install tcpdump
-RUN apt-get update && apt-get install -y tcpdump
+#RUN apt-get update && apt-get install -y tcpdump
+
+### Install tshark
+#RUN apt-get update
+#RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
 
 ### Install chrome in docker image:
 
@@ -45,5 +49,8 @@ RUN pip install --upgrade pip
 
 RUN pip install selenium
 #==4.0.0a5
+
+RUN apt-get install apt-utils
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y tshark
 
 CMD ["python", "runner.py"]
