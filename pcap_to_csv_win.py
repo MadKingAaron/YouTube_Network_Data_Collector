@@ -36,7 +36,7 @@ def convert_pcap_to_csv(pcap:str):
     make_temp_file(pcap, tmp_file)
 
     csv_name = get_csv_file_name(tmp_file)
-    cmd = ('tshark -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %('./'+tmp_file, csv_name))
+    cmd = ('"C:\\Program Files\\Wireshark\\tshark" -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %('./'+tmp_file, csv_name))
     print(cmd)
     os.system(cmd)
 
