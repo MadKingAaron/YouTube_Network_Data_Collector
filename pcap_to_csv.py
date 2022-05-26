@@ -6,14 +6,14 @@ def check_if_exists(folder):
         os.mkdir(folder)
 
 def get_pcaps():
-    return [file for file in glob.glob("*.pcap")]
+    return [file for file in glob.glob("./Captures/*.pcap")]
 
 def format_pcap_name(pcap):
     pcap = pcap.replace('.pcap', '')
     new_name =''.join(char for char in pcap if char.isalnum())
     new_name += '.pcap'
     #os.rename(pcap, new_name)
-    return new_name
+    return "./Captures/"+new_name.replace("Captures","")
 
 def convert_all_pcaps():
     pcaps = get_pcaps()
@@ -23,7 +23,8 @@ def convert_all_pcaps():
 
 def get_csv_file_name(pcap_name:str)->str:
     name = pcap_name.replace('.pcap', '.csv')
-    return os.path.join(folder_name, name)
+    name = name.replace('Captures', 'CSVs')
+    return name #os.path.join(folder_name, name)
 
 def make_temp_file(pcap:str, tmp_name:str):
     shutil.copy(pcap, tmp_name)
@@ -33,14 +34,25 @@ def del_tmp_file(tmp_name:str):
 
 def convert_pcap_to_csv(pcap:str):
     tmp_file = format_pcap_name(pcap)
-    make_temp_file(pcap, tmp_file)
-
     csv_name = get_csv_file_name(tmp_file)
-    cmd = ("tshark -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -E header=y -E separator=, -E quote=d -E occurrence=f > %s" %('./'+tmp_file, csv_name))
-    print(cmd)
-    os.system(cmd)
+    csvs = [file.replace('./CSVs\\', './CSVs/') for file in glob.glob("./CSVs/*.csv")]
+    new_pcap = pcap.replace('./Captures\\', './Captures/')
+    if csv_name in csvs:
+        print('\n\nSkip %s\n\n' %csv_name)
+        return 
+    
+    elif tmp_file != new_pcap:
+        make_temp_file(pcap, tmp_file)    
+        cmd = ('"C:\\Program Files\\Wireshark\\tshark" -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %(tmp_file, csv_name))
+        print(cmd)
+        os.system(cmd)
+        del_tmp_file(tmp_file)
+    else:
+        #make_temp_file(pcap, tmp_file)
+        cmd = ('"C:\\Program Files\\Wireshark\\tshark" -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %(pcap, csv_name))
+        print(cmd)
+        os.system(cmd)
 
-    del_tmp_file(tmp_file)
 
     #subprocess.run(cmd)
 
