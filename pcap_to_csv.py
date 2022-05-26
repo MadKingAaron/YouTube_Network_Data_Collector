@@ -33,14 +33,24 @@ def del_tmp_file(tmp_name:str):
 
 def convert_pcap_to_csv(pcap:str):
     tmp_file = format_pcap_name(pcap)
-    make_temp_file(pcap, tmp_file)
+    if pcap != tmp_file:
+        make_temp_file(pcap, tmp_file)
 
-    csv_name = get_csv_file_name(tmp_file)
-    cmd = ('tshark -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %('./'+tmp_file, csv_name))
-    print(cmd)
-    os.system(cmd)
+        csv_name = get_csv_file_name(tmp_file)
+        cmd = ('tshark -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %('./'+tmp_file, csv_name))
+        print(cmd)
+        os.system(cmd)
 
-    del_tmp_file(tmp_file)
+        del_tmp_file(tmp_file)
+    else:
+        # make_temp_file(pcap, tmp_file)
+
+        csv_name = get_csv_file_name(pcap)
+        cmd = ('tshark -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %('./'+pcap, csv_name))
+        print(cmd)
+        os.system(cmd)
+
+        # del_tmp_file(tmp_file)
 
     #subprocess.run(cmd)
 
