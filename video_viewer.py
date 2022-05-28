@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from os.path import exists
 # from webdriver_manager.chrome import ChromeDriverManager
 import time, datetime
 import subprocess, shlex
@@ -46,9 +47,21 @@ class YouTube_Viewer():
         print(title)
         return driver
     
+    def __check_files_for_dup(self, video_title):
+        return exists(video_title+'.pcap')
+
+    def __set_video_pcap(self, video_title):
+        number = 2
+        new_title = video_title
+        while self.__check_files_for_dup(new_title):
+            new_title = video_title + '_' + str(number)
+            number += 1
+        return new_title
+
     def __get_video_title(self):
-        return self.scraper.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
-    
+        video_title = self.scraper.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
+        return self.__set_video_pcap(video_title)
+        
     def __get_video_length(self):
         # Obtain the length of the youtube video
         duration = self.scraper.find_elements_by_xpath("//span[@class='ytp-time-duration']")[0].text
@@ -151,6 +164,7 @@ class YouTube_Viewer():
     
     def stop_session(self):
         self.scraper.close()
+        del self.scraper
 
         
 """ def get_video_time(driver):
