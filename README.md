@@ -26,6 +26,11 @@ Commands to copy:
  - sudo docker rm -f $(sudo docker ps -a -q)
  - sudo docker image prune -f
 
+## Packet Conversion
+
+ - Make sure to all captures are in the `./Capture` folder created when capturing packets. 
+ - Run `pcap_to_csv.py` for Linux/Mac OS or `pcap_to_csv_win.py` for Windows systems
+
  
 
  
