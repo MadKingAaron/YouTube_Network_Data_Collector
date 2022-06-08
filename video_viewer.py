@@ -7,8 +7,9 @@ from os.path import exists
 # from webdriver_manager.chrome import ChromeDriverManager
 import time, datetime
 import subprocess, shlex
-import re
+import re, os
 
+CAP_FOLDER = './Captures'
 
 def check_if_has_hours(time):
     pattern = re.compile(r"[0-9]+:[0-9]+:[0-9]+", re.IGNORECASE)
@@ -27,6 +28,8 @@ class YouTube_Viewer():
         self.scraper = self.__setup_youtube_scraper(headless=headless)
         self.videoLength = self.__get_video_length()
         self.video_title = self.__get_video_title()
+        
+        ensure_folder(folder_name=CAP_FOLDER)
     
     def __setup_youtube_scraper(self, headless=True):
         options = Options()
@@ -47,8 +50,14 @@ class YouTube_Viewer():
         print(title)
         return driver
     
+    def __get_folder_dir(self, video_title):
+        return CAP_FOLDER+'/'+video_title+'.pcap'
+
+    def __set_folder_dir(self):
+        return self.__get_folder_dir(self.video_title)
+
     def __check_files_for_dup(self, video_title):
-        return exists(video_title+'.pcap')
+        return exists(self.__get_folder_dir(video_title))
 
     def __set_video_pcap(self, video_title):
         number = 2
@@ -114,8 +123,9 @@ class YouTube_Viewer():
                 return True
         return False """
     
-    def __start_tcpdump(self,password:str)->subprocess.Popen:
-        proc = subprocess.Popen(['sudo', '-S','tshark','-w', self.video_title+'.pcap'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
+   def __start_tcpdump(self,password:str)->subprocess.Popen:
+        print("Saving capture to:",self.__set_folder_dir())
+        proc = subprocess.Popen(['sudo', '-S','tshark','-w', self.__set_folder_dir()], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
         
         try:
             proc.stdin.write((password + '\n'))
