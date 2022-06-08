@@ -6,7 +6,7 @@ def check_if_exists(folder):
         os.mkdir(folder)
 
 def get_pcaps():
-    return [file for file in glob.glob("*.pcap")]
+    return [file for file in glob.glob("./Captures/*.pcap")]
 
 def format_pcap_name(pcap):
     pcap = pcap.replace('.pcap', '')
@@ -33,14 +33,23 @@ def del_tmp_file(tmp_name:str):
 
 def convert_pcap_to_csv(pcap:str):
     tmp_file = format_pcap_name(pcap)
-    make_temp_file(pcap, tmp_file)
+    csvs = [file for file in glob.glob("./CSVs/*.csv")]
+    if csv_name in csvs:
+        print('\n\nSkip %s\n\n' %csv_name)
+        return 
+    elif pcap != tmp_file:
+        make_temp_file(pcap, tmp_file)
+        csv_name = get_csv_file_name(tmp_file)
+        cmd = ('tshark -r %s -Y "(udp.port == 443 || udp.port == 80) && quic" -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %('./'+tmp_file, csv_name))
+        print(cmd)
+        os.system(cmd)
+        del_tmp_file(tmp_file)
+    else:
+        csv_name = get_csv_file_name(pcap)
+        cmd = ('tshark -r %s -Y "(udp.port == 443 || udp.port == 80) && quic" -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %('./'+pcap, csv_name))
+        print(cmd)
+        os.system(cmd)
 
-    csv_name = get_csv_file_name(tmp_file)
-    cmd = ('"C:\\Program Files\\Wireshark\\tshark" -r %s -T fields -e frame.number -e frame.time -e frame.time_relative -e frame.time_delta -e ip.src -e ip.dst -e ip.proto -e frame.len -e frame.protocols -e data.len -e quic -E header=y -E separator=, -E quote=d -E occurrence=f > %s' %('./'+tmp_file, csv_name))
-    print(cmd)
-    os.system(cmd)
-
-    del_tmp_file(tmp_file)
 
     #subprocess.run(cmd)
 
