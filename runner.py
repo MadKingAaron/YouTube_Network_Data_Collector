@@ -9,7 +9,7 @@ def main():
     repeat=True
 
     video_list = loadVideoList.loadVideoList('youtubeVideoList_10.txt')
-    while(repeat):
+    while(True):
         for video in video_list:
             try:
                 viewer = video_viewer.YouTube_Viewer(video_url=video, headless=True)
@@ -17,6 +17,8 @@ def main():
                 viewer.stop_session()
             except:
                 pass
+        if(not repeat):
+            break
 
 if __name__ == '__main__':
     main()
