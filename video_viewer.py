@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.options import Options
 import time, datetime
 import subprocess, shlex
 import re
+from os.path import exists
 
 
 def check_if_has_hours(time):
@@ -49,8 +50,24 @@ class YouTube_Viewer():
         print(title)
         return driver
     
+    def __check_files_for_dup(self, video_title):
+        return exists(video_title+'.pcap')
+
+    def __set_video_pcap(self, video_title):
+        number = 1
+        new_title = video_title
+        #new_title = video_title + '_' + str(number) + 'r'
+        while self.__check_files_for_dup(new_title):
+            new_title = video_title + '_' + str(number) + 'r'
+            number += 1
+        return new_title
+
     def __get_video_title(self):
-        return self.scraper.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
+        video_title = self.scraper.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
+        return self.__set_video_pcap(video_title)
+    
+    #def __get_video_title(self):
+    #    return self.scraper.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
     
     def __get_video_length(self):
         # Obtain the length of the youtube video
