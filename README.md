@@ -1,5 +1,14 @@
 
 # YouTube Network Data Collector
+
+Data Collection and Data Manipulation/Packet Conversion blocks of the OpenTracer pipeline
+
+ - Data collection code in runner.py and video_viewer.py
+ - Packet conversion code in pcap_to_csv.py
+
+The Feature Engineering and Learning blocks of OpenTracer can be found here:
+[https://github.com/rhystracy/Chunk_Size_Predictor](https://github.com/rhystracy/Chunk_Size_Predictor)
+
 ## Data Collection
 
     python3 runner.py <password>
