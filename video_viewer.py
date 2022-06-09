@@ -1,14 +1,16 @@
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from os.path import exists
 # from webdriver_manager.chrome import ChromeDriverManager
 import time, datetime
 import subprocess, shlex
-import re
-from os.path import exists
+import re, os
 
+CAP_FOLDER = './Captures'
 
 def check_if_has_hours(time):
     pattern = re.compile(r"[0-9]+:[0-9]+:[0-9]+", re.IGNORECASE)
@@ -27,6 +29,8 @@ class YouTube_Viewer():
         self.scraper = self.__setup_youtube_scraper(headless=headless)
         self.videoLength = self.__get_video_length()
         self.video_title = self.__get_video_title()
+        
+        ensure_folder(folder_name=CAP_FOLDER)
     
     def __setup_youtube_scraper(self, headless=True):
         options = Options()
@@ -50,24 +54,26 @@ class YouTube_Viewer():
         print(title)
         return driver
     
+    def __get_folder_dir(self, video_title):
+        return CAP_FOLDER+'/'+video_title+'.pcap'
+
+    def __set_folder_dir(self):
+        return self.__get_folder_dir(self.video_title)
+
     def __check_files_for_dup(self, video_title):
-        return exists(video_title+'.pcap')
+        return exists(self.__get_folder_dir(video_title))
 
     def __set_video_pcap(self, video_title):
         number = 1
         new_title = video_title
-        #new_title = video_title + '_' + str(number) + 'r'
         while self.__check_files_for_dup(new_title):
-            new_title = video_title + '_' + str(number) + 'r'
+            new_title = video_title + '_' + str(number)
             number += 1
         return new_title
 
     def __get_video_title(self):
         video_title = self.scraper.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
         return self.__set_video_pcap(video_title)
-    
-    #def __get_video_title(self):
-    #    return self.scraper.find_element(By.CSS_SELECTOR, "h1.title.style-scope.ytd-video-primary-info-renderer > yt-formatted-string.style-scope.ytd-video-primary-info-renderer").get_attribute("innerHTML")
     
     def __get_video_length(self):
         # Obtain the length of the youtube video
@@ -122,7 +128,8 @@ class YouTube_Viewer():
         return False """
     
     def __start_tcpdump(self)->subprocess.Popen:
-        proc = subprocess.Popen(['tshark','-w', self.video_title+'.pcap'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
+        print("Saving capture to:",self.__set_folder_dir())
+        proc = subprocess.Popen(['tshark','-w', self.__set_folder_dir()], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE,universal_newlines=True)
         proc.stdin.flush()
         return proc
     
@@ -160,67 +167,3 @@ class YouTube_Viewer():
     def stop_session(self):
         self.scraper.close()
 
-        
-""" def get_video_time(driver):
-    # Obtain the length of the youtube video
-    duration = driver.find_elements_by_xpath("//span[@class='ytp-time-duration']")[0].text
-
-    # Obtain the length of the video in seconds
-    x = time.strptime(duration, '%M:%S')
-    x1 = datetime.timedelta(minutes=x.tm_min, seconds=x.tm_sec).total_seconds()
-    return x1 #+ 1 #Add 1 second to prevent stopping early
-
-def start_video(driver, timeToWatch):
-    #Get the movie player
-    video = driver.find_element_by_id('movie_player')
-    print('Play!')
-    time.sleep(2)
-    
-    #Hit play on video
-    video.send_keys(Keys.SPACE) #hits space
-    time.sleep(timeToWatch)
-    
-    #Stop video
-    video.click()
-    print('Click')
-    time.sleep(1)
-    print('Done!')
-
-def load_page(chromeDriverPath:str, url:str, loadWaitTime:int):
-    #Load Chrome and get URL
-    service = Service(chromeDriverPath)
-    driver = webdriver.Chrome(service=service)
-    driver.get(url)
-    #Wait for page to load
-    for i in range(loadWaitTime):
-        print(i)
-        time.sleep(1)
-    return driver
-
-def watch_video(chromeDriverPath:str, url:str, loadWaitTime:int):
-    driver = load_page(chromeDriverPath, url, loadWaitTime)
-    total_runtime = get_video_time(driver)
-    start_video(driver, total_runtime)
-
-
-# watch_video('./chromedriver', 'https://www.youtube.com/watch?v=w6YeJOYOOds', 2)
-# youtube_video = YouTube_Viewer('https://www.youtube.com/watch?v=w6YeJOYOOds')
-# youtube_video.start_video()
-
-service = Service('./chromedriver')
-driver = webdriver.Chrome(service=service)
-driver.get('https://www.youtube.com/watch?v=DXUAyRRkI6k')
-# wait for the page to load everything (works without it)
-for i in range(10):
-    print(i)
-    time.sleep(1)
-
-video = driver.find_element_by_id('movie_player')
-print('Play!')
-time.sleep(2)
-video.send_keys(Keys.SPACE) #hits space
-time.sleep(1)
-video.click()
-print('Click')
-time.sleep(1)
-print('Done!') """
