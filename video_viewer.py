@@ -11,6 +11,15 @@ import re, os
 
 CAP_FOLDER = './Captures'
 
+def ensure_folder(folder_name):
+
+    # Check if folder exists
+    exists = os.path.exists(folder_name)
+
+    if not exists:
+        # Create folder 
+        os.makedirs(folder_name)
+
 def check_if_has_hours(time):
     pattern = re.compile(r"[0-9]+:[0-9]+:[0-9]+", re.IGNORECASE)
     return pattern.match(time)
