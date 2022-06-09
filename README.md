@@ -28,7 +28,7 @@ Commands to copy:
 
 ## Packet Conversion
 
- - Make sure to all captures are in the `./Capture` folder created when capturing packets. 
+ - Make sure to all captures are in the `./Captures` folder created when capturing packets. (Move './tmp/Captures' to './Captures')
  - Run `pcap_to_csv.py` for Linux/Mac OS or `pcap_to_csv_win.py` for Windows systems
 
  
