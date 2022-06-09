@@ -13,6 +13,7 @@ The Feature Engineering and Learning blocks of OpenTracer can be found here:
 
     python3 runner.py <password>
    As tshark captures must be run as sudo, pass password as an argument when running `runner.py`
+   Captures are done as repeat captures of all videos as default, can change to one capture per video by changing the repeat variable to False in runner.py
 ## Packet Conversion
 
  - Make sure to all captures are in the `./Capture` folder created when capturing packets. 
