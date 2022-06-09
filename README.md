@@ -24,4 +24,7 @@ The Feature Engineering and Learning blocks of OpenTracer can be found here:
  - Chrome Web Driver (in root of project folder)
  - Google Chrome installation
 
+
+## To Use With Docker:
+Move to the "docker" branch
  
