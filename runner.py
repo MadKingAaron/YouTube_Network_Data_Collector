@@ -5,10 +5,11 @@ def main():
     if len(sys.argv) < 2:
         print('Make sure to add linux password as cmd argument')
     else:
+        repeat=True
         video_list = loadVideoList.loadVideoList('youtubeVideoList.txt')
-        for video in video_list:
-            for i in range(5):
-                print(i, video)
+        
+        while(True):
+            for video in video_list:
                 try:
                     viewer = video_viewer.YouTube_Viewer(video_url=video, headless=True)
                     viewer.start_video(password=sys.argv[1])
@@ -17,6 +18,8 @@ def main():
                 except:
                     print("Skip")
                     pass
+            if(not repeat):
+                break
 
 if __name__ == '__main__':
     main()
